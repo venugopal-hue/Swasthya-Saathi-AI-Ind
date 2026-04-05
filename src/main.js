@@ -158,10 +158,14 @@ const translations = {
     "depression_mild": "Mild depression",
     "depression_moderate": "Moderate depression",
     "depression_severe": "Severe depression",
-    "depression_adv_0": "You seem to be doing well. Keep up your healthy routines.",
-    "depression_adv_1": "You might be feeling a bit low. Focus on sleep and self-care.",
-    "depression_adv_2": "It might be helpful to talk to a counselor or professional.",
-    "depression_adv_3": "Please reach out to a professional immediately. You are not alone."
+    "depression_adv_3": "Please reach out to a professional immediately. You are not alone.",
+    "notif_welcome": "Welcome back, {name}!",
+    "notif_quest": "Quest Completed! +{xp} XP",
+    "notif_level_up": "LEVEL UP! You are now Level {level}",
+    "quest_login_required": "Please login to claim rewards!",
+    "quest_completed": "Completed!",
+    "chat_engine_init": "Saathi AI Engine initialized.",
+    "wellness_score_msg": "Analysis complete."
   },
   "hi": {
     "nav_home": "मुख्य पृष्ठ",
@@ -316,10 +320,14 @@ const translations = {
     "depression_mild": "हल्का अवसाद",
     "depression_moderate": "मध्यम अवसाद",
     "depression_severe": "गंभीर अवसाद",
-    "depression_adv_0": "आप अच्छा कर रहे हैं। अपनी स्वस्थ दिनचर्या जारी रखें।",
-    "depression_adv_1": "आप थोड़ा कम महसूस कर रहे होंगे। नींद और आत्म-देखभाल पर ध्यान दें।",
-    "depression_adv_2": "किसी परामर्शदाता या पेशेवर से बात करना सहायक हो सकता है।",
-    "depression_adv_3": "कृपया तुरंत किसी पेशेवर से संपर्क करें। आप अकेले नहीं हैं।"
+    "depression_adv_3": "कृपया तुरंत किसी पेशेवर से संपर्क करें। आप अकेले नहीं हैं।",
+    "notif_welcome": "वापसी पर स्वागत है, {name}!",
+    "notif_quest": "खोज पूरी हुई! +{xp} XP",
+    "notif_level_up": "स्तर ऊपर! अब आप स्तर {level} पर हैं",
+    "quest_login_required": "पुरस्कार प्राप्त करने के लिए कृपया लॉगिन करें!",
+    "quest_completed": "पूरा हुआ!",
+    "chat_engine_init": "साथी AI इंजन शुरू हुआ।",
+    "wellness_score_msg": "विश्लेषण पूरा हुआ।"
   }
 };
 
@@ -637,7 +645,7 @@ function renderDashboardProfile() {
   const xpProgressBar = document.getElementById('xp-progress-bar');
   const lbXpDisplay = document.getElementById('lb-user-xp-display');
 
-  if (dropdownGreeting) dropdownGreeting.innerText = profile.name ? profile.name.split(' ')[0] : 'User';
+  if (dropdownGreeting) dropdownGreeting.innerText = profile.name ? profile.name.split(' ')[0] : (lang === 'hi' ? 'उपयोगकर्ता' : 'User');
   if (dashName) dashName.innerText = profile.name || 'User';
   if (dashEmail) dashEmail.innerText = profile.email || '';
   if (profile.name) {
@@ -658,14 +666,25 @@ function renderDashboardProfile() {
 
   const level = Math.floor(xp / 100) + 1;
   const nextLevelXp = level * 100;
+  const progressPercent = xp % 100;
+  
   if (userLevelQ) userLevelQ.innerText = level;
   if (userXpQ) userXpQ.innerText = `${xp} ${xpLabel} / ${nextLevelXp} ${xpLabel}`;
-  if (xpProgressBar) xpProgressBar.style.width = (xp % 100) + '%';
+  if (xpProgressBar) {
+    xpProgressBar.style.width = progressPercent + '%';
+    xpProgressBar.style.background = 'linear-gradient(90deg, #0ea5e9, #10b981)';
+  }
+
+  if (xp > 0 && Math.floor(xp / 100) > Math.floor((window.prevXp || 0) / 100)) {
+    showToast(`${T.notif_level_up.replace('{level}', level)}! 🏆`, 'success');
+    if (typeof confetti === 'function') confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
+  }
+  window.prevXp = xp;
 
   if (dashLevel) {
-    let rankKey = "rank_bronze", icon = "ph-medal", color = "var(--primary)";
+    let rankKey = "rank_newbie", icon = "ph-medal", color = "var(--primary)";
     if (xp >= 1000) { rankKey = "rank_diamond"; color = "#7dd3fc"; icon = "ph-sketch-logo"; }
-    else if (xp >= 500) { rankKey = "rank_gold"; color = "#fbbf24"; }
+    else if (xp >= 500) { rankKey = "rank_gold"; color = "#fbbf24"; icon = "ph-crown"; }
     else if (xp >= 200) { rankKey = "rank_silver"; color = "#94a3b8"; }
     const rankLabel = T[rankKey] || rankKey.replace('rank_', '').toUpperCase();
     dashLevel.innerHTML = `<i class="ph-fill ${icon}"></i> ${rankLabel}`;
@@ -700,25 +719,57 @@ async function fetchLeaderboard() {
   const container = document.getElementById('leaderboard-list');
   if (!container || !db) return;
   try {
-    const q = query(collection(db, 'users'), orderBy('xp', 'desc'), limit(10));
+    const q = query(collection(db, 'users'), orderBy('xp', 'desc'), limit(15));
     const snapshot = await getDocs(q);
-    if (snapshot.empty) return;
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 2rem;">No data yet.</p>';
+      return;
+    }
     const currentUid = auth?.currentUser?.uid;
-    const rankColors = ['#fbbf24', '#94a3b8', '#b45309'];
-    container.innerHTML = '';
-    let rank = 1;
-    snapshot.forEach(docSnap => {
-      const user = docSnap.data();
-      const isCurrentUser = docSnap.id === currentUid;
-      const rankColor = rank <= 3 ? rankColors[rank - 1] : 'var(--text-muted)';
-      const row = document.createElement('div');
-      row.className = `leaderboard-item ${isCurrentUser ? 'current-user' : ''}`;
-      row.style.display = 'flex'; row.style.justifyContent = 'space-between'; row.style.padding = '1rem';
-      if (isCurrentUser) row.style.background = 'rgba(14, 165, 233, 0.1)';
-      row.innerHTML = `<span>${rank}. ${user.name || 'User'}</span><span>${user.xp || 0} XP</span>`;
-      container.appendChild(row);
-      rank++;
+    const users = [];
+    snapshot.forEach(docSnap => users.push({ id: docSnap.id, ...docSnap.data() }));
+
+    const top3 = users.slice(0, 3);
+    const others = users.slice(3);
+
+    let html = `<div class="leaderboard-grand-container">`;
+    
+    // Podium
+    html += `<div class="leaderboard-podium">`;
+    [1, 0, 2].forEach(idx => {
+      const u = top3[idx];
+      if (!u) { html += `<div></div>`; return; }
+      const rank = idx + 1;
+      const medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : '🥉');
+      const glow = rank === 1 ? 'lb-glow-gold' : (rank === 2 ? 'lb-glow-silver' : 'lb-glow-bronze');
+      html += `
+        <div class="podium-rank-box podium-rank-${rank} ${glow}">
+          <div class="podium-medal">${medal}</div>
+          <div class="podium-name">${u.name || 'User'}</div>
+          <div class="podium-xp">${u.xp || 0} XP</div>
+        </div>
+      `;
     });
+    html += `</div>`;
+
+    // List
+    html += `<div class="rankings-list">`;
+    users.forEach((u, i) => {
+      const rank = i + 1;
+      const isYou = u.id === currentUid;
+      html += `
+        <div class="rankings-item-premium ${isYou ? 'you' : ''}">
+          <div style="font-weight:900; font-size:1.2rem; color:rgba(255,255,255,0.15);">${rank}</div>
+          <div style="display:flex; align-items:center; gap:0.8rem;">
+            <div style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; border:1px solid rgba(255,255,255,0.1);">${(u.name || 'U').charAt(0)}</div>
+            <div style="font-weight:600; font-size:0.95rem;">${u.name || 'User'} ${isYou ? '<span style="font-size:0.6rem; opacity:0.5;">(YOU)</span>' : ''}</div>
+          </div>
+          <div style="text-align:right; font-weight:800; font-size:1.1rem; color:var(--primary);">${u.xp || 0} <span style="font-size:0.7rem; font-weight:500; opacity:0.7;">XP</span></div>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+    container.innerHTML = html;
   } catch (err) { console.error('Leaderboard error', err); }
 }
 
@@ -797,12 +848,35 @@ if (analyzeBtn && symptomsInput) {
       if (document.getElementById('res-condition')) document.getElementById('res-condition').innerText = res.condition;
       if (document.getElementById('res-advice')) document.getElementById('res-advice').innerText = res.advice;
       const medList = document.getElementById('res-medicines-list');
-      if (medList) { medList.innerHTML = res.medicines.map(m => `<li>${m}</li>`).join(''); }
-      document.getElementById('checker-loading')?.classList.add('hidden');
-      document.getElementById('results-content')?.classList.remove('hidden');
+      if (medList) { medList.innerHTML = res.medicines.map(m => `<li style="margin-bottom:0.4rem; color:var(--text-main); font-weight:500;">${m}</li>`).join(''); }
+      
+      const resultsContent = document.getElementById('results-content');
+      if (resultsContent) {
+        resultsContent.classList.remove('hidden');
+        resultsContent.style.animation = 'fadeIn 0.6s ease-out';
+      }
       analyzeBtn.disabled = false;
-    }, 1200);
+      document.getElementById('checker-loading')?.classList.add('hidden');
+      showToast(`${res.condition} analyzed!`, 'success');
+    }, 1500);
   });
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `notif-item ${type}`;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '1.5rem';
+  toast.style.right = '1.5rem';
+  toast.style.zIndex = '9999999';
+  toast.style.animation = 'slideInRight 0.3s ease-out';
+  toast.style.width = '300px';
+  toast.innerHTML = `<div style="display:flex; align-items:center; gap:0.8rem; padding:1.2rem; background:rgba(15,23,42,0.9); border-radius:12px; border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+    <i class="ph-fill ${type === 'success' ? 'ph-check-circle text-green' : 'ph-info text-blue'}" style="font-size:1.5rem;"></i>
+    <div style="color:white; font-weight:500; font-size:0.9rem;">${message}</div>
+  </div>`;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(() => toast.remove(), 400); }, 3500);
 }
 
 // CHATBOT
@@ -1026,35 +1100,42 @@ document.addEventListener('click', async (e) => {
 
 // FINAL INIT
 document.addEventListener('DOMContentLoaded', () => {
-  applyLanguage(currentLang);
-  if (typeof renderWellnessQuestions === 'function') renderWellnessQuestions();
+    // Start Chatbot Engine
+    if (typeof MentalHealthChatbot === 'function') {
+        window.activeChatbot = new MentalHealthChatbot();
+    }
+    
+    applyLanguage(currentLang);
+    if (typeof renderWellnessQuestions === 'function') renderWellnessQuestions();
+    fetchLeaderboard();
+    setInterval(fetchLeaderboard, 300000); // 5 min refresh
 
-  // --- HERO ENTRANCE ANIMATION ---
-  if (typeof anime !== 'undefined') {
-    anime.timeline({ easing: 'easeOutExpo' })
-      .add({
-        targets: '.hero-content h1, .hero-content p, .hero-buttons',
-        translateY: [30, 0],
-        opacity: [0, 1],
-        delay: anime.stagger(150),
-        duration: 1200
-      })
-      .add({
-        targets: '.ring-laser',
-        opacity: [0, 1],
-        scale: [1.2, 1],
-        duration: 800
-      }, '-=500');
-  }
+    // --- HERO ENTRANCE ANIMATION ---
+    if (typeof anime !== 'undefined') {
+        anime.timeline({ easing: 'easeOutExpo' })
+            .add({
+                targets: '.hero-content h1, .hero-content p, .hero-buttons',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                delay: anime.stagger(150),
+                duration: 1200
+            })
+            .add({
+                targets: '.ring-laser',
+                opacity: [0, 1],
+                scale: [1.2, 1],
+                duration: 800
+            }, '-=500');
+    }
 
-  // --- NEXUS PARALLAX ---
-  const nexus = document.querySelector('.neural-nexus');
-  if (nexus) {
-    window.addEventListener('mousemove', (e) => {
-      const { clientX, clientY } = e;
-      const x = (clientX - window.innerWidth / 2) / 30;
-      const y = (clientY - window.innerHeight / 2) / 30;
-      nexus.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-    });
-  }
+    // --- NEXUS PARALLAX ---
+    const nexus = document.querySelector('.neural-nexus');
+    if (nexus) {
+        window.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const x = (clientX - window.innerWidth / 2) / 40;
+            const y = (clientY - window.innerHeight / 2) / 40;
+            nexus.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+        });
+    }
 });
