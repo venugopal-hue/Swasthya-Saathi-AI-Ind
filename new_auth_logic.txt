@@ -1,0 +1,185 @@
+// ==========================================
+// AUTHENTICATION LOGIC (PHONE / OTP)
+// ==========================================
+import { auth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from './firebase.js';
+
+window.isUserLoggedIn = false;
+
+const authModal = document.getElementById('auth-modal');
+const closeAuthModal = document.getElementById('close-auth-modal');
+const loginBtn = document.getElementById('login-btn');
+const userProfileBtn = document.getElementById('user-profile-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const userDropdown = document.getElementById('user-dropdown');
+const authForm = document.getElementById('auth-form');
+const authPhone = document.getElementById('auth-phone');
+const authOtp = document.getElementById('auth-otp');
+const authError = document.getElementById('auth-error');
+const authSubmitBtn = document.getElementById('auth-submit-btn');
+
+const phoneInputGroup = document.getElementById('phone-input-group');
+const otpInputGroup = document.getElementById('otp-input-group');
+
+let confirmationResult = null; // Stores firebase confirmation result
+
+// Setup hidden recapture
+function getRecaptcha() {
+  if (!window.recaptchaVerifier && auth) {
+    try {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible'
+      });
+    } catch(err) {
+      console.warn("Recaptcha error:", err);
+    }
+  }
+}
+
+if(loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    resetAuthModal();
+    authModal.classList.remove('hidden');
+    getRecaptcha();
+  });
+}
+
+function resetAuthModal() {
+  authError.classList.add('hidden');
+  phoneInputGroup.classList.remove('hidden');
+  otpInputGroup.classList.add('hidden');
+  authPhone.value = '';
+  authOtp.value = '';
+  authPhone.required = true;
+  authOtp.required = false;
+  authSubmitBtn.innerText = "Send OTP";
+  confirmationResult = null;
+}
+
+if(closeAuthModal) {
+  closeAuthModal.addEventListener('click', () => {
+    authModal.classList.add('hidden');
+    resetAuthModal();
+  });
+}
+
+if(userProfileBtn) {
+  userProfileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdown.classList.toggle('hidden');
+  });
+  document.addEventListener('click', (e) => {
+    if(!userProfileBtn.contains(e.target)) userDropdown.classList.add('hidden');
+  });
+}
+
+if(authForm) {
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError.classList.add('hidden');
+    
+    // If Firebase isn't fully configured
+    if (!auth) {
+      console.warn("Using Mock Login since Firebase Auth isn't wired.");
+      if(authSubmitBtn.innerText === "Send OTP") {
+         authSubmitBtn.innerText = "Verification...";
+         setTimeout(() => {
+           phoneInputGroup.classList.add('hidden');
+           otpInputGroup.classList.remove('hidden');
+           authSubmitBtn.innerText = "Verify OTP";
+           authOtp.required = true;
+           authPhone.required = false;
+         }, 800);
+      } else {
+         authSubmitBtn.innerText = "Logging in...";
+         setTimeout(() => {
+           updateAuthUI(true);
+           authModal.classList.add('hidden');
+           resetAuthModal();
+         }, 800);
+      }
+      return;
+    }
+    
+    // Firebase LIVE flow
+    if (!confirmationResult) {
+       // Step 1: Request OTP
+       authSubmitBtn.innerText = "Sending...";
+       try {
+         const ph = authPhone.value;
+         confirmationResult = await signInWithPhoneNumber(auth, ph, window.recaptchaVerifier);
+         phoneInputGroup.classList.add('hidden');
+         otpInputGroup.classList.remove('hidden');
+         authSubmitBtn.innerText = "Verify OTP";
+         authOtp.required = true;
+         authPhone.required = false;
+       } catch(err) {
+         authError.innerText = err.message || "Failed to send OTP.";
+         authError.classList.remove('hidden');
+         authSubmitBtn.innerText = "Send OTP";
+         // Reset recaptcha on failure
+         if(window.recaptchaVerifier) window.recaptchaVerifier.render().then((vId) => window.recaptchaVerifier.reset(vId));
+       }
+    } else {
+       // Step 2: Verify OTP
+       authSubmitBtn.innerText = "Verifying...";
+       try {
+         const code = authOtp.value;
+         await confirmationResult.confirm(code);
+         authModal.classList.add('hidden');
+         resetAuthModal();
+       } catch(err) {
+         authError.innerText = "Invalid OTP code.";
+         authError.classList.remove('hidden');
+         authSubmitBtn.innerText = "Verify OTP";
+       }
+    }
+  });
+}
+
+if(logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    if(auth) {
+      signOut(auth).catch(err => console.error(err));
+    } else {
+      updateAuthUI(false);
+      navigateTo('home-page');
+    }
+  });
+}
+
+if (auth) {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      updateAuthUI(true);
+    } else {
+      updateAuthUI(false);
+      const currentActive = document.querySelector('.page.active');
+      if(currentActive && ['telemedicine-page', 'quests-page', 'dashboard-page'].includes(currentActive.id)) {
+        navigateTo('home-page');
+      }
+    }
+  });
+} else {
+  updateAuthUI(false);
+}
+
+function updateAuthUI(isLoggedIn) {
+  window.isUserLoggedIn = isLoggedIn;
+  if(isLoggedIn) {
+    if(loginBtn) loginBtn.classList.add('hidden');
+    if(userProfileBtn) userProfileBtn.classList.remove('hidden');
+  } else {
+    if(loginBtn) loginBtn.classList.remove('hidden');
+    if(userProfileBtn) userProfileBtn.classList.add('hidden');
+  }
+}
+
+// Attach footer navigation
+document.querySelectorAll('.footer-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = e.currentTarget.getAttribute('data-target');
+    navigateTo(target);
+    window.scrollTo(0, 0);
+  });
+});
