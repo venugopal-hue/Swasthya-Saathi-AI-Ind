@@ -139,7 +139,29 @@ const translations = {
     "label_email": "Email Address",
     "ph_email": "you@example.com",
     "label_password": "Password",
-    "ph_password": "••••••••"
+    "ph_password": "••••••••",
+    "wellness_q1": "Little interest or pleasure in doing things",
+    "wellness_q2": "Feeling down, depressed, or hopeless",
+    "wellness_q3": "Trouble sleeping or sleeping too much",
+    "wellness_q4": "Feeling tired or having little energy",
+    "wellness_q5": "Poor appetite or overeating",
+    "wellness_q6": "Feeling bad about yourself — or that you're a failure",
+    "wellness_q7": "Trouble concentrating on things",
+    "wellness_q8": "Moving/speaking slowly or being restless",
+    "wellness_q9": "Thoughts of hurting yourself or better off dead",
+    "wellness_label_0": "Not at all",
+    "wellness_label_1": "Several days",
+    "wellness_label_2": "More than half",
+    "wellness_label_3": "Nearly every day",
+    "wellness_score_msg": "Your Wellness Score",
+    "depression_minimal": "Minimal depression",
+    "depression_mild": "Mild depression",
+    "depression_moderate": "Moderate depression",
+    "depression_severe": "Severe depression",
+    "depression_adv_0": "You seem to be doing well. Keep up your healthy routines.",
+    "depression_adv_1": "You might be feeling a bit low. Focus on sleep and self-care.",
+    "depression_adv_2": "It might be helpful to talk to a counselor or professional.",
+    "depression_adv_3": "Please reach out to a professional immediately. You are not alone."
   },
   "hi": {
     "nav_home": "मुख्य पृष्ठ",
@@ -275,7 +297,29 @@ const translations = {
     "label_email": "ईमेल पता",
     "ph_email": "you@example.com",
     "label_password": "पासवर्ड",
-    "ph_password": "••••••••"
+    "ph_password": "••••••••",
+    "wellness_q1": "काम करने में कम रुचि या खुशी महसूस करना",
+    "wellness_q2": "उदास, निराश या लाचार महसूस करना",
+    "wellness_q3": "सोने में परेशानी या बहुत अधिक सोना",
+    "wellness_q4": "थका हुआ महसूस करना या ऊर्जा की कमी",
+    "wellness_q5": "कम भूख लगना या बहुत अधिक खाना",
+    "wellness_q6": "अपने बारे में बुरा महसूस करना - या असफल महसूस करना",
+    "wellness_q7": "चीजों पर ध्यान केंद्रित करने में परेशानी",
+    "wellness_q8": "धीरे बोलना/घूमना या बहुत अधिक बेचैनी",
+    "wellness_q9": "खुद को नुकसान पहुँचाने या मरने के विचार",
+    "wellness_label_0": "बिल्कुल नहीं",
+    "wellness_label_1": "कई दिनों तक",
+    "wellness_label_2": "आधे से अधिक दिन",
+    "wellness_label_3": "लगभग हर दिन",
+    "wellness_score_msg": "आपका स्वास्थ्य स्कोर",
+    "depression_minimal": "न्यूनतम अवसाद",
+    "depression_mild": "हल्का अवसाद",
+    "depression_moderate": "मध्यम अवसाद",
+    "depression_severe": "गंभीर अवसाद",
+    "depression_adv_0": "आप अच्छा कर रहे हैं। अपनी स्वस्थ दिनचर्या जारी रखें।",
+    "depression_adv_1": "आप थोड़ा कम महसूस कर रहे होंगे। नींद और आत्म-देखभाल पर ध्यान दें।",
+    "depression_adv_2": "किसी परामर्शदाता या पेशेवर से बात करना सहायक हो सकता है।",
+    "depression_adv_3": "कृपया तुरंत किसी पेशेवर से संपर्क करें। आप अकेले नहीं हैं।"
   }
 };
 
@@ -799,13 +843,185 @@ if (chatSendBtn && chatInput) {
   });
 }
 
-// WELLNESS TEST
-function calculateWellnessScore() {
-  let score = 0;
-  document.querySelectorAll('#wellness-questions input[type="radio"]:checked').forEach(el => score += parseInt(el.value));
-  alert(`Your Wellness Score: ${score}/15`);
+
+// ==========================================
+// WELLNESS TEST LOGIC
+// ==========================================
+const wellnessQuestions = [
+  { id: 'q1', key: 'wellness_q1' },
+  { id: 'q2', key: 'wellness_q2' },
+  { id: 'q3', key: 'wellness_q3' },
+  { id: 'q4', key: 'wellness_q4' },
+  { id: 'q5', key: 'wellness_q5' },
+  { id: 'q6', key: 'wellness_q6' },
+  { id: 'q7', key: 'wellness_q7' },
+  { id: 'q8', key: 'wellness_q8' },
+  { id: 'q9', key: 'wellness_q9' }
+];
+
+function renderWellnessQuestions() {
+  const container = document.getElementById('wellness-questions');
+  if (!container) return;
+  const lang = currentLang || 'en';
+  const T = translations[lang] || translations.en;
+  
+  container.innerHTML = wellnessQuestions.map((q, idx) => `
+    <div class="wellness-question-card glass-panel" style="padding: 1.2rem; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+      <p style="font-weight:600; margin-bottom:1rem; color:var(--text-main);">${idx + 1}. ${T[q.key] || q.key}</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:0.5rem;">
+        ${[0, 1, 2, 3].map(v => `
+          <label style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.8rem; text-align:center; color:var(--text-muted);">
+            <input type="radio" name="${q.id}" value="${v}" style="accent-color:var(--primary); width:1.2rem; height:1.2rem;">
+            <span>${T['wellness_label_' + v] || v}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
 }
-document.getElementById('submit-wellness-btn')?.addEventListener('click', calculateWellnessScore);
+
+function calculateWellnessScore() {
+  const radios = document.querySelectorAll('#wellness-questions input[type="radio"]:checked');
+  const lang = currentLang || 'en';
+  const T = translations[lang] || translations.en;
+
+  if (radios.length < wellnessQuestions.length) {
+    alert(T.answer_all_questions || 'Please answer all questions.');
+    return;
+  }
+
+  let score = 0;
+  radios.forEach(r => score += parseInt(r.value));
+
+  const resultsDiv = document.getElementById('wellness-results');
+  const scoreDisplay = document.getElementById('wellness-score-display');
+  const riskLevel = document.getElementById('wellness-risk-level');
+  const advice = document.getElementById('wellness-advice');
+
+  let levelKey = '', advKey = '', colorClass = 'text-blue';
+
+  if (score <= 4) { levelKey = 'depression_minimal'; advKey = 'depression_adv_0'; }
+  else if (score <= 9) { levelKey = 'depression_mild'; advKey = 'depression_adv_1'; }
+  else if (score <= 14) { levelKey = 'depression_moderate'; advKey = 'depression_adv_2'; colorClass = 'text-orange'; }
+  else { levelKey = 'depression_severe'; advKey = 'depression_adv_3'; colorClass = 'text-red'; }
+
+  if (scoreDisplay) { scoreDisplay.textContent = score; scoreDisplay.className = colorClass; }
+  if (riskLevel) { riskLevel.textContent = T[levelKey] || levelKey; riskLevel.className = colorClass; }
+  if (advice) advice.textContent = T[advKey] || advKey;
+
+  if (resultsDiv) {
+    resultsDiv.classList.remove('hidden');
+    resultsDiv.scrollIntoView({ behavior: 'smooth' });
+    if(typeof confetti === "function") {
+       confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 }, colors: ['#0ea5e9', '#8b5cf6'] });
+    }
+  }
+
+  // Update Quest XP if quest 3 is active
+  if (window.isUserLoggedIn && window.currentUserProfile) {
+    const currentXP = window.currentUserProfile.xp || 0;
+    syncProfileUpdate({ xp: currentXP + 30 }); // Mindful Moment quest
+  }
+}
+
+function resetWellness() {
+  document.querySelectorAll('#wellness-questions input[type="radio"]').forEach(r => r.checked = false);
+  const res = document.getElementById('wellness-results');
+  if (res) res.classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==========================================
+// GAMIFICATION & BUTTON HANDLERS
+// ==========================================
+function playNotificationSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const audioCtx = new AudioContext();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(580, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.3);
+  } catch(e) { console.log("Audio play blocked"); }
+}
+
+// Global Event Listeners
+document.addEventListener('click', async (e) => {
+  const target = e.target;
+
+  // Wellness Buttons
+  if (target.id === 'submit-wellness-btn' || target.closest('#submit-wellness-btn')) {
+    calculateWellnessScore();
+  }
+  if (target.id === 'reset-wellness-btn' || target.closest('#reset-wellness-btn')) {
+    resetWellness();
+  }
+
+  // Reset Checker
+  if (target.id === 'reset-checker-btn' || target.closest('#reset-checker-btn')) {
+    if (symptomsInput) symptomsInput.value = '';
+    const res = document.getElementById('checker-results');
+    if (res) res.classList.add('hidden');
+    navigateTo('checker-page');
+  }
+
+  // Daily Check-in
+  if (target.id === 'daily-check-in-btn') {
+    if(!window.isUserLoggedIn) {
+       if (authModal) authModal.classList.remove('hidden');
+       return;
+    }
+    target.disabled = true;
+    target.innerText = "Checked In!";
+    target.style.background = "var(--success)";
+    if(typeof confetti === "function") confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    playNotificationSound();
+    const current = window.currentUserProfile || {xp: 0, streak: 0};
+    await syncProfileUpdate({ streak: (current.streak || 0) + 1, xp: (current.xp || 0) + 50 });
+  }
+
+  // Alerts Done Buttons
+  const doneBtn = target.closest('.btn-done');
+  if (doneBtn) {
+    if(!window.isUserLoggedIn) { alert("Login to earn XP!"); return; }
+    doneBtn.disabled = true;
+    const li = doneBtn.closest('li');
+    if (li) {
+      li.style.opacity = '0.4';
+      li.style.pointerEvents = 'none';
+      const strong = li.querySelector('strong');
+      if (strong) strong.style.textDecoration = 'line-through';
+    }
+    playNotificationSound();
+    const current = window.currentUserProfile || {xp: 0};
+    await syncProfileUpdate({ xp: (current.xp || 0) + 15 });
+  }
+
+  // Quest Buttons
+  const questBtn = target.closest('.quest-btn');
+  if (questBtn) {
+    if(!window.isUserLoggedIn) { alert(translations[currentLang]?.quest_login_required || "Login required"); return; }
+    if (questBtn.classList.contains('claimed')) return;
+    const gainedXp = parseInt(questBtn.dataset.xp || "0");
+    questBtn.disabled = true;
+    questBtn.innerText = translations[currentLang]?.quest_completed || "Completed";
+    questBtn.classList.add('claimed');
+    questBtn.style.opacity = '0.5';
+    if(typeof confetti === "function") confetti({ particleCount: 80, spread: 50, origin: { y: 0.7 } });
+    playNotificationSound();
+    const current = window.currentUserProfile || {xp: 0};
+    await syncProfileUpdate({ xp: (current.xp || 0) + gainedXp });
+  }
+});
 
 
 // FINAL INIT
