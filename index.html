@@ -556,48 +556,40 @@
       </section>
 
 
-      <!-- WELLNESS TEST PAGE -->
-      <section id="wellness-page" class="page hidden">
-        <div class="page-header">
-          <h2 data-i18n="wellness_title">Mental Wellness Assessment</h2>
-          <p data-i18n="wellness_subtitle">A quick screening tool to understand your emotional well-being over the past
-            2 weeks.</p>
-        </div>
+<!-- WELLNESS TEST PAGE -->
+<section id="wellness-page" class="page">
+  <div class="page-header">
+    <h2 data-i18n="wellness_title">Mental Wellness Assessment</h2>
+    <p data-i18n="wellness_subtitle">A quick screening tool to understand your emotional well-being over the past 2 weeks.</p>
+  </div>
 
-        <div class="checker-container glass-panel" id="wellness-test-container">
-          <div id="wellness-questions" style="display:flex; flex-direction:column; gap:1.5rem;">
-            <!-- JS injected -->
-          </div>
-          <div style="display:flex; gap:1rem; margin-top:2rem;">
-            <button class="btn-secondary full-width" id="reset-wellness-btn" style="flex:1;">
-              <i class="ph-bold ph-arrow-counter-clockwise"></i> <span data-i18n="btn_reset_wellness_text">Reset
-                Test</span>
-            </button>
-            <button class="btn-primary full-width" id="submit-wellness-btn" style="flex:2;">
-              <i class="ph-bold ph-check-circle"></i> <span data-i18n="btn_submit_wellness_text">Calculate Score</span>
-            </button>
-          </div>
-        </div>
+  <div class="checker-container glass-panel" id="wellness-test-container">
+    <!-- Questions will be injected here by the script below -->
+    <div id="wellness-questions" style="display:flex; flex-direction:column; gap:1.5rem;"></div>
+    
+    <div style="display:flex; gap:1rem; margin-top:2rem;">
+      <button class="btn-secondary full-width" id="reset-wellness-btn" style="flex:1;" onclick="resetWellness()">
+        <i class="ph-bold ph-arrow-counter-clockwise"></i> 
+        <span data-i18n="btn_reset_wellness_text">Reset Test</span>
+      </button>
+      <button class="btn-primary full-width" id="submit-wellness-btn" style="flex:2;" onclick="calculateWellnessScore()">
+        <i class="ph-bold ph-check-circle"></i> 
+        <span data-i18n="btn_submit_wellness_text">Calculate Score</span>
+      </button>
+    </div>
+  </div>
 
-        <div class="results-section hidden" id="wellness-results" style="margin-top: 2rem;">
-          <div class="glass-panel"
-            style="text-align: center; padding: 2rem; display: flex; flex-direction: column; align-items: center;">
-            <h3 data-i18n="wellness_result_title" style="margin-bottom: 1rem;">Assessment Results</h3>
-
-            <div id="wellness-score-display"
-              style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;" class="text-blue">
-            </div>
-            <div id="wellness-risk-level" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;"></div>
-            <p id="wellness-advice"
-              style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-            </p>
-            <p class="text-muted" style="font-size: 0.85rem;" data-i18n="wellness_disclaimer">*This is a preliminary
-              screening tool, not a clinical diagnosis.</p>
-            <button class="btn-secondary mt-4" data-nav="chatbot-page" data-i18n="btn_talk_ai_wellness">Discuss with
-              Saathi AI</button>
-          </div>
-        </div>
-      </section>
+  <!-- Results Section (Hidden by default) -->
+  <div class="results-section hidden" id="wellness-results" style="margin-top: 2rem;">
+    <div class="glass-panel" style="text-align: center; padding: 2rem; display: flex; flex-direction: column; align-items: center;">
+      <h3 data-i18n="wellness_result_title" style="margin-bottom: 1rem;">Assessment Results</h3>
+      <div id="wellness-score-display" style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;" class="text-blue"></div>
+      <div id="wellness-risk-level" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;"></div>
+      <p id="wellness-advice" style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 500px;"></p>
+      <p class="text-muted" style="font-size: 0.85rem;" data-i18n="wellness_disclaimer">*This is a preliminary screening tool, not a clinical diagnosis.</p>
+    </div>
+  </div>
+</section>
 
       <!-- HEALTH QUESTS PAGE -->
       <section id="quests-page" class="page hidden">
@@ -896,6 +888,94 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+// 1. Questions Data (PHQ-9)
+const wellnessQuestions = [
+  { id: 'q1', text: 'Little interest or pleasure in doing things' },
+  { id: 'q2', text: 'Feeling down, depressed, or hopeless' },
+  { id: 'q3', text: 'Trouble falling or staying asleep, or sleeping too much' },
+  { id: 'q4', text: 'Feeling tired or having little energy' },
+  { id: 'q5', text: 'Poor appetite or overeating' },
+  { id: 'q6', text: 'Feeling bad about yourself — or that you are a failure' },
+  { id: 'q7', text: 'Trouble concentrating on things, such as reading the newspaper' },
+  { id: 'q8', text: 'Moving or speaking so slowly that other people could have noticed' },
+  { id: 'q9', text: 'Thoughts that you would be better off dead, or of hurting yourself' }
+];
+
+// 2. Render Questions into the container
+function renderWellnessQuestions() {
+  const container = document.getElementById('wellness-questions');
+  if (!container) return;
+  
+  container.innerHTML = wellnessQuestions.map((q, idx) => `
+    <div class="wellness-question-card glass-panel" style="padding: 1.2rem; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+      <p style="font-weight:600; margin-bottom:1rem;">${idx + 1}. ${q.text}</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap:0.5rem;">
+        ${['Not at all', 'Several days', 'More than half', 'Nearly every day'].map((label, v) => `
+          <label style="display:flex; flex-direction:column; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.8rem; text-align:center;">
+            <input type="radio" name="${q.id}" value="${v}" style="accent-color:var(--primary); width:1.2rem; height:1.2rem;">
+            <span>${label}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// 3. Calculate Score and Show Results
+function calculateWellnessScore() {
+  const radios = document.querySelectorAll('#wellness-questions input[type="radio"]:checked');
+  if (radios.length < wellnessQuestions.length) {
+    alert('Please answer all questions before submitting.');
+    return;
+  }
+
+  let score = 0;
+  radios.forEach(r => score += parseInt(r.value));
+
+  const resultsDiv = document.getElementById('wellness-results');
+  const scoreDisplay = document.getElementById('wellness-score-display');
+  const riskLevel = document.getElementById('wellness-risk-level');
+  const advice = document.getElementById('wellness-advice');
+
+  let level = '', msg = '', colorClass = 'text-blue';
+
+  if (score <= 4) {
+    level = 'Minimal Depression';
+    msg = 'You seem to be doing well. Keep up your healthy routines.';
+  } else if (score <= 9) {
+    level = 'Mild Depression';
+    msg = 'You might be feeling a bit low. Focus on sleep and self-care.';
+  } else if (score <= 14) {
+    level = 'Moderate Depression';
+    msg = 'It might be helpful to talk to a counselor or professional.';
+    colorClass = 'text-orange';
+  } else {
+    level = 'Severe Depression';
+    msg = 'Please reach out to a professional immediately. You are not alone.';
+    colorClass = 'text-red';
+  }
+
+  scoreDisplay.textContent = score;
+  scoreDisplay.className = colorClass;
+  riskLevel.textContent = level;
+  advice.textContent = msg;
+
+  resultsDiv.classList.remove('hidden');
+  resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// 4. Reset Test
+function resetWellness() {
+  document.querySelectorAll('#wellness-questions input[type="radio"]').forEach(r => r.checked = false);
+  document.getElementById('wellness-results').classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', renderWellnessQuestions);
+</script>
+
 </body>
 
 </html>
