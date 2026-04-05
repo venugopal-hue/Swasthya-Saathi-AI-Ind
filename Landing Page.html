@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swasthya Saathi AI – Where Care Meets Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f1a;
+    --bg3: #12121f;
+    --card: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.08);
+    --blue1: #3b82f6;
+    --blue2: #06b6d4;
+    --blue3: #818cf8;
+    --purple: #a855f7;
+    --text: #f0f0ff;
+    --muted: #8892a4;
+    --subtle: rgba(255,255,255,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ─── AMBIENT GLOWS ─── */
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+    animation: drift 12s ease-in-out infinite;
+  }
+  .glow-orb.g1 { width: 600px; height: 600px; background: rgba(59,130,246,0.08); top: -200px; left: -200px; animation-delay: 0s; }
+  .glow-orb.g2 { width: 500px; height: 500px; background: rgba(168,85,247,0.07); top: 30%; right: -150px; animation-delay: -4s; }
+  .glow-orb.g3 { width: 400px; height: 400px; background: rgba(6,182,212,0.06); bottom: 20%; left: 20%; animation-delay: -8s; }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 30px) scale(0.97); }
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(10,10,15,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .nav-logo {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-badge {
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: var(--blue1);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--muted);
+    border-radius: 2px;
+    transform-origin: center;
+    transition: transform 0.28s ease, opacity 0.2s ease, background-color 0.2s ease;
+  }
+  .hamburger:hover span { background: var(--text); }
+  .hamburger.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 5rem;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--blue2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-eyebrow .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--blue2);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-sub {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-desc {
+    max-width: 600px;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2.2rem;
+    border-radius: 12px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    color: white;
+    border: none;
+    box-shadow: 0 0 30px rgba(59,130,246,0.35), 0 4px 15px rgba(0,0,0,0.3);
+    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.25s ease;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(59,130,246,0.5), 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  .btn-primary:focus-visible {
+    outline: 2px solid rgba(6,182,212,0.7);
+    outline-offset: 3px;
+  }
+  .btn-primary:hover::after { opacity: 1; }
+
+  .btn-secondary {
+    padding: 0.9rem 2.2rem;
+    border-radius: 12px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--card-border);
+    transition: border-color 0.3s, background 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-secondary:hover {
+    border-color: rgba(59,130,246,0.5);
+    background: rgba(59,130,246,0.06);
+  }
+
+  /* ─── STATS STRIP ─── */
+  .stats-strip {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto 6rem;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+  .stat-item {
+    flex: 1;
+    min-width: 160px;
+    text-align: center;
+    padding: 1.5rem 2rem;
+    border-right: 1px solid var(--card-border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-label {
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION ─── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 5rem 2rem;
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue2);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    line-height: 1.75;
+    margin-bottom: 3rem;
+  }
+
+  /* ─── PROBLEM SECTION ─── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  .problem-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .problem-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .problem-card:hover {
+    border-color: rgba(59,130,246,0.3);
+    transform: translateX(6px);
+  }
+  .problem-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .pi-red { background: rgba(239,68,68,0.15); }
+  .pi-orange { background: rgba(249,115,22,0.15); }
+  .pi-yellow { background: rgba(234,179,8,0.15); }
+  .problem-card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; color: var(--text); }
+  .problem-card-text { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+  .problem-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+  .metric-card:hover { border-color: rgba(59,130,246,0.35); }
+  .metric-val {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .metric-desc { color: var(--muted); font-size: 0.78rem; margin-top: 0.3rem; line-height: 1.5; }
+
+  /* ─── FEATURES ─── */
+  #features { background: var(--bg2); }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover {
+    border-color: rgba(59,130,246,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .fi-blue { background: rgba(59,130,246,0.15); }
+  .fi-cyan { background: rgba(6,182,212,0.15); }
+  .fi-purple { background: rgba(168,85,247,0.15); }
+  .fi-green { background: rgba(34,197,94,0.15); }
+  .fi-pink { background: rgba(236,72,153,0.15); }
+  .fi-orange { background: rgba(249,115,22,0.15); }
+  .fi-yellow { background: rgba(234,179,8,0.15); }
+
+  .feature-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+  .feature-text { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+
+  /* ─── HOW IT WORKS ─── */
+  /* ── HOW IT WORKS wrapper ── */
+  .flow-steps-wrapper {
+    position: relative;
+  }
+
+  /* The connector line sits ABOVE the cards, perfectly at circle-center height */
+  .flow-connector {
+    position: absolute;
+    /* circle is 52px tall, card padding-top is 2rem = 32px → center = 32 + 26 = 58px */
+    top: 58px;
+    /* start & end at the horizontal center of first/last card:
+       each card is 1/3 wide; center of card 1 = 1/6 = 16.67%
+       center of card 3 = 5/6 = 83.33%                          */
+    left: calc(16.67% + 1px);
+    right: calc(16.67% + 1px);
+    height: 2px;
+    background: linear-gradient(90deg,
+      rgba(59,130,246,0.15),
+      rgba(59,130,246,0.55) 30%,
+      rgba(6,182,212,0.55) 70%,
+      rgba(6,182,212,0.15));
+    pointer-events: none;
+    z-index: 2;
+  }
+  /* dashed animation overlay */
+  .flow-connector::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.18) 0px,
+      rgba(255,255,255,0.18) 6px,
+      transparent 6px,
+      transparent 14px
+    );
+    animation: dashMove 2s linear infinite;
+  }
+  @keyframes dashMove {
+    from { background-position: 0 0; }
+    to   { background-position: 40px 0; }
+  }
+
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .flow-step {
+    text-align: center;
+    padding: 2rem 1.5rem 2rem;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+  }
+  .flow-step:hover {
+    border-color: rgba(59,130,246,0.35);
+    transform: translateY(-3px);
+  }
+
+  .flow-num {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: white;
+    margin: 0 auto 1.2rem;
+    box-shadow: 0 0 20px rgba(59,130,246,0.35);
+    position: relative;
+    z-index: 3; /* sits above the connector line */
+  }
+  .flow-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+  .flow-text { color: var(--muted); font-size: 0.85rem; line-height: 1.7; }
+
+  /* ─── TECH STACK ─── */
+  #tech { background: var(--bg2); }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .tech-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.4rem;
+    transition: border-color 0.3s;
+  }
+  .tech-card:hover { border-color: rgba(59,130,246,0.35); }
+  .tech-cat {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--blue2);
+    margin-bottom: 0.8rem;
+  }
+  .tech-items { display: flex; flex-direction: column; gap: 0.4rem; }
+  .tech-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .tech-item:hover { border-color: rgba(59,130,246,0.3); }
+
+  /* ─── SCOPE ─── */
+  .scope-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .scope-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .scope-card:hover {
+    border-color: rgba(59,130,246,0.3);
+    transform: translateY(-3px);
+  }
+  .scope-card-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .scope-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .scope-tag {
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--blue2);
+  }
+
+  /* ─── TEAM ─── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .team-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .team-card:hover {
+    border-color: rgba(59,130,246,0.35);
+    transform: translateY(-4px);
+  }
+  .team-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: white;
+    margin: 0 auto 1rem;
+    box-shadow: 0 0 25px rgba(59,130,246,0.25);
+  }
+  .team-name {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+  }
+  .team-role {
+    color: var(--blue2);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .team-links { display: flex; flex-direction: column; gap: 0.3rem; }
+  .team-link {
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .team-link:hover { color: var(--blue1); }
+
+  /* ─── CTA SECTION ─── */
+  .cta-section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 2rem;
+    text-align: center;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(59,130,246,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .cta-title span {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cta-sub { color: var(--muted); font-size: 1.05rem; margin-bottom: 2.5rem; }
+
+  .quote-card {
+    display: inline-block;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.2rem 2rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-style: italic;
+    margin-top: 3rem;
+  }
+  .quote-card strong {
+    color: var(--blue1);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--card-border);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-logo {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .footer-meta { color: var(--muted); font-size: 0.8rem; }
+  .footer-event {
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--blue2);
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59,130,246,0.2), transparent);
+    margin: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── COMING SOON badge ─── */
+  .coming-soon-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 61px; left: 0; right: 0;
+      background: rgba(10,10,15,0.98);
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--card-border);
+      gap: 1.2rem;
+    }
+    .hamburger { display: flex; }
+    .problem-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .flow-steps { grid-template-columns: 1fr; }
+    .flow-connector { display: none; }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+    .scope-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; max-width: 360px; }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--card-border); }
+    .stat-item:last-child { border-bottom: none; }
+  }
+  @media (max-width: 480px) {
+    .hero-cta { flex-direction: column; align-items: center; }
+    .tech-grid { grid-template-columns: 1fr; }
+    .nav-badge { display: none; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-orb g1"></div>
+<div class="glow-orb g2"></div>
+<div class="glow-orb g3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Swasthya Saathi AI</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#tech">Tech Stack</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <span class="nav-badge">#KarmaCrew</span>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    AI Healthcare & Well-Being · Karma Crew
+  </div>
+  <h1 class="hero-title">Swasthya<br>Saathi AI</h1>
+  <p class="hero-sub">Where Care Meets Intelligence</p>
+  <p class="hero-desc">
+    An AI-powered smart healthcare assistant bridging the gap between patients and healthcare services — enabling early disease detection, mental health support, and remote telemedicine for everyone.
+  </p>
+  <div class="hero-cta">
+    <a href="index.html" class="btn-primary">Get Started →</a>
+    <a href="#features" class="btn-secondary">Explore Features</a>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-num">1:11K</div>
+    <div class="stat-label">Rural Doctor Ratio</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">60%</div>
+    <div class="stat-label">Cost Reduction via Early Detection</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">80%</div>
+    <div class="stat-label">Avoid Mental Health Support</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">40%</div>
+    <div class="stat-label">Hospital Load Reduction</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEM SECTION -->
+<section id="problem">
+  <div class="section-inner">
+    <div class="problem-grid">
+      <div>
+        <span class="section-label">The Problem</span>
+        <h2 class="section-title">Healthcare Gaps<br>That Can't Wait</h2>
+        <p class="section-desc">Millions across rural and underserved India lack access to basic healthcare. Early symptoms go unnoticed, mental health is stigmatized, and doctors remain out of reach.</p>
+        <div class="problem-cards">
+          <div class="problem-card">
+            <div class="problem-icon pi-red">🏥</div>
+            <div>
+              <div class="problem-card-title">Limited Healthcare Access</div>
+              <div class="problem-card-text">Only 1 doctor per 11,000 people in rural areas — far below WHO's recommended 1:1,000 standard.</div>
+            </div>
+          </div>
+          <div class="problem-card">
+            <div class="problem-icon pi-orange">🧠</div>
+            <div>
+              <div class="problem-card-title">Mental Health Stigma</div>
+              <div class="problem-card-text">80% of individuals avoid mental health support due to stigma, high cost, and lack of accessible resources.</div>
+            </div>
+          </div>
+          <div class="problem-card">
+            <div class="problem-icon pi-yellow">⚠️</div>
+            <div>
+              <div class="problem-card-title">Late Disease Detection</div>
+              <div class="problem-card-text">Many ignore early symptoms due to low awareness or cost concerns, leading to expensive late-stage treatments.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="problem-metrics">
+        <div class="metric-card">
+          <div class="metric-val">1:11K</div>
+          <div class="metric-desc">Rural doctor-to-patient ratio in India</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">60%</div>
+          <div class="metric-desc">Treatment cost reduction via early detection</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">80%</div>
+          <div class="metric-desc">People don't seek mental health help</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">30–40%</div>
+          <div class="metric-desc">Hospital load reduction with AI pre-screening</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES SECTION -->
+<section id="features">
+  <div class="section-inner">
+    <span class="section-label">Core Features</span>
+    <h2 class="section-title">Everything You Need<br>for Smarter Healthcare</h2>
+    <p class="section-desc">From reactive care to proactive wellness — Swasthya Saathi covers the complete healthcare spectrum.</p>
+    <div class="features-grid">
+
+      <div class="feature-card" style="--accent-color: #3b82f6;">
+        <div class="feature-icon-wrap fi-blue">🔬</div>
+        <div class="feature-title">AI Disease Predictor</div>
+        <div class="feature-text">Input your symptoms and receive a list of possible conditions with severity levels and recommended next steps.</div>
+      </div>
+
+      <div class="feature-card" style="--accent-color: #a855f7;">
+        <div class="feature-icon-wrap fi-purple">💬</div>
+        <div class="feature-title">Mental Health Chatbot</div>
+        <div class="feature-text">24/7 conversational AI providing emotional support, stress management tips, and integration with MANAS Helpline (14416).</div>
+      </div>
+
+      <div class="feature-card" style="--accent-color: #06b6d4;">
+        <div class="feature-icon-wrap fi-cyan">📹</div>
+        <div class="feature-title">Remote Consultation</div>
+        <div class="feature-text">Chat or video-based telemedicine with doctor recommendations for users who cannot access hospitals easily.</div>
+      </div>
+
+      <div class="feature-card" style="--accent-color: #22c55e;">
+        <div class="feature-icon-wrap fi-green">📊</div>
+        <div class="feature-title">Health Dashboard</div>
+        <div class="feature-text">Track your symptoms history over time and generate basic health reports to share with medical professionals.</div>
+      </div>
+
+      <div class="feature-card" style="--accent-color: #ec4899;">
+        <div class="feature-icon-wrap fi-pink">🏆</div>
+        <div class="feature-title">Gamification</div>
+        <div class="feature-text">Daily health check streaks, rewards for healthy habits, and a leaderboard to make wellness engaging and fun.</div>
+      </div>
+
+      <div class="feature-card" style="--accent-color: #f97316;">
+        <div class="feature-icon-wrap fi-orange">🔔</div>
+        <div class="feature-title">Smart Alerts & Emergency</div>
+        <div class="feature-text">Automated reminders for hydration, sleep, and checkups — plus an emergency alert button for critical situations.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <span class="section-label">System Flow</span>
+    <h2 class="section-title">How Swasthya Saathi<br>Works For You</h2>
+    <p class="section-desc">A simple six-step journey from symptom input to comprehensive care — powered by AI, built with empathy.</p>
+    <div class="flow-steps-wrapper">
+      <!-- connector line rendered separately so it sits at exactly circle-center height -->
+      <div class="flow-connector"></div>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-title">Log In</div>
+          <div class="flow-text">Create a secure profile and access your personal health dashboard with ease.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-title">Input Symptoms</div>
+          <div class="flow-text">Describe what you're experiencing — the AI listens and understands natural language.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-title">AI Analyzes</div>
+          <div class="flow-text">Our hybrid ML + rule-based model processes your data and identifies patterns in real-time.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-title">Get Insights</div>
+          <div class="flow-text">Receive possible conditions, severity levels, precautions, and advice on when to see a doctor.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-title">Mental Support</div>
+          <div class="flow-text">Access the mental health chatbot for emotional support, stress tips, or crisis helpline connection.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-title">Consult Remotely</div>
+          <div class="flow-text">Connect with a real doctor via telemedicine — no travel, no waiting rooms, no barriers.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TECH STACK -->
+<section id="tech">
+  <div class="section-inner">
+    <span class="section-label">Technology Stack</span>
+    <h2 class="section-title">Built With Modern,<br>Reliable Technology</h2>
+    <p class="section-desc">A carefully chosen stack that balances performance, scalability, and developer experience.</p>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-cat">Frontend</div>
+        <div class="tech-items">
+          <div class="tech-item">HTML5</div>
+          <div class="tech-item">CSS3</div>
+          <div class="tech-item">JavaScript</div>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-cat">AI / ML</div>
+        <div class="tech-items">
+          <div class="tech-item">OpenAI API</div>
+          <div class="tech-item">Gemini API</div>
+          <div class="tech-item">Python (Scikit-learn)</div>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-cat">Backend & Database</div>
+        <div class="tech-items">
+          <div class="tech-item">Firebase Auth + DB</div>
+          <div class="tech-item">Supabase (Optional)</div>
+          <div class="tech-item">REST APIs</div>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-cat">Tools & APIs</div>
+        <div class="tech-items">
+          <div class="tech-item">VS Code</div>
+          <div class="tech-item">Symptom Checker API</div>
+          <div class="tech-item">Chatbot API</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SCOPE -->
+<section id="scope">
+  <div class="section-inner">
+    <span class="section-label">Scope & Impact</span>
+    <h2 class="section-title">Designed for Scale,<br>Built for Everyone</h2>
+    <p class="section-desc">From urban apartments to remote villages — Swasthya Saathi is built to be universally accessible and endlessly scalable.</p>
+    <div class="scope-grid">
+      <div class="scope-card">
+        <div class="scope-card-title">🌍 Wide Reach</div>
+        <div class="scope-tags">
+          <span class="scope-tag">Urban Populations</span>
+          <span class="scope-tag">Rural Villages</span>
+          <span class="scope-tag">College Campuses</span>
+          <span class="scope-tag">Elderly Care</span>
+          <span class="scope-tag">All Age Groups</span>
+        </div>
+      </div>
+      <div class="scope-card">
+        <div class="scope-card-title">⚙️ Scalable Integrations</div>
+        <div class="scope-tags">
+          <span class="scope-tag">Wearable Devices</span>
+          <span class="scope-tag">Govt. Health Systems</span>
+          <span class="scope-tag">Hospital Partnerships</span>
+          <span class="scope-tag">MANAS Helpline</span>
+        </div>
+      </div>
+      <div class="scope-card">
+        <div class="scope-card-title">🚀 Future Roadmap</div>
+        <div class="scope-tags">
+          <span class="scope-tag">Mobile App</span>
+          <span class="scope-tag">Wearable Integration</span>
+          <span class="scope-tag">Real Dataset Training</span>
+          <span class="scope-tag">Govt. API Integration</span>
+        </div>
+      </div>
+      <div class="scope-card">
+        <div class="scope-card-title">✅ Expected Outcomes</div>
+        <div class="scope-tags">
+          <span class="scope-tag">Early Detection</span>
+          <span class="scope-tag">Reduced Costs</span>
+          <span class="scope-tag">Mental Well-being</span>
+          <span class="scope-tag">Health Awareness</span>
+          <span class="scope-tag">Better Accessibility</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="section-inner" style="text-align:center;">
+    <span class="section-label">The Team</span>
+    <h2 class="section-title" style="text-align:center;">Meet Karma Crew</h2>
+    <p class="section-desc" style="margin-left:auto;margin-right:auto;text-align:center;">The minds behind Swasthya Saathi AI, competing at #KarmaCrew organized by Artsy Technologies Pvt Ltd.</p>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">VR</div>
+        <div class="team-name">Venugopal Rao</div>
+        <div class="team-role">Team Lead</div>
+        <div class="team-links">
+          <a href="/cdn-cgi/l/email-protection#7701121902101807161b051618464f474537101a161e1b5914181a" class="team-link">📧 <span class="__cf_email__" data-cfemail="83f5e6edf6e4ecf3e2eff1e2ecb2bbb3b1c3e4eee2eaefade0ecee">[email&#160;protected]</span></a>
+          <a href="tel:+917019922967" class="team-link">📞 +91 7019922967</a>
+          <a href="https://www.linkedin.com/in/venugopalrao2006india/" target="_blank" class="team-link">🔗 LinkedIn Profile</a>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">SC</div>
+        <div class="team-name">Sushma Chavan</div>
+        <div class="team-role">Team Member</div>
+        <div class="team-links">
+          <a href="/cdn-cgi/l/email-protection#522127213a3f33626462656062626412353f333b3e7c313d3f" class="team-link">📧 <span class="__cf_email__" data-cfemail="a5d6d0d6cdc8c49593959297959593e5c2c8c4ccc98bc6cac8">[email&#160;protected]</span></a>
+          <a href="tel:+918431496344" class="team-link">📞 +91 8431496344</a>
+          <a href="https://www.linkedin.com/in/sushmachavan06/" target="_blank" class="team-link">🔗 LinkedIn Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Ready to Transform<br><span>Healthcare Access?</span></h2>
+  <p class="cta-sub">Join us in building a healthier, more connected India — one AI interaction at a time.</p>
+  <a href="index.html" class="btn-primary" style="font-size:1.1rem;padding:1rem 2.8rem;">Get Started →</a>
+  <div class="quote-card">
+    <strong>"Swasthya Saathi AI – Where Care Meets Intelligence."</strong> — Venugopal Rao
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Swasthya Saathi AI</div>
+  <div class="footer-meta">Built by Karma Crew · Artsy Technologies Pvt Ltd. · 23-03-2026</div>
+  <div class="footer-event">#KarmaCrew</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+  // Mobile hamburger toggle
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  if (hamburger && navLinks) {
+    hamburger.setAttribute('aria-expanded', 'false');
+
+    const setMenuState = (isOpen) => {
+      navLinks.classList.toggle('open', isOpen);
+      hamburger.classList.toggle('active', isOpen);
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+    };
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = !navLinks.classList.contains('open');
+      setMenuState(isOpen);
+    });
+
+    navLinks.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        setMenuState(false);
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      const clickedInsideMenu = navLinks.contains(event.target);
+      const clickedHamburger = hamburger.contains(event.target);
+      if (!clickedInsideMenu && !clickedHamburger) {
+        setMenuState(false);
+      }
+    });
+  }
+
+  // Scroll-based fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card, .flow-step, .scope-card, .tech-card, .team-card, .metric-card, .problem-card').forEach((el) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

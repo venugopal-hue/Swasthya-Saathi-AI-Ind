@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swasthya Saathi AI</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Anime.js for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="/src/style.css">
+  <link rel="stylesheet" href="/src/mental-health-chatbot.css">
+</head>
+
+<body>
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo" style="cursor:pointer;" onclick="document.querySelector('[data-target=\'home-page\']').click()">
+        <i class="ph-fill ph-heartbeat"></i>
+        <span class="hide-mobile">Swasthya Saathi</span>
+      </div>
+
+      <div class="nav-actions" style="display:flex; align-items:center;">
+        <button id="lang-toggle" class="btn-secondary"><span class="nav-label">A/अ</span></button>
+        <button id="login-btn" class="btn-primary-small" style="margin-left: 0.5rem;"><i class="ph-bold ph-sign-in"></i>
+          <span class="nav-label">Login</span></button>
+        <div id="user-profile-btn" class="btn-icon hidden"
+          style="position: relative;">
+          <i class="ph-fill ph-user"></i>
+          <div id="user-dropdown" class="hidden glass-panel"
+            style="position: absolute; top: 120%; right: 0; padding: 1rem; min-width: 200px; z-index: 1000; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <p style="margin: 0 0 0.5rem 0; font-size: 0.95rem; font-weight: bold; color: var(--primary-light);">
+              Greetings, <span id="dropdown-greeting-name">User</span></p>
+            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 0.5rem 0;">
+            <button class="btn-clear text-left full-width"
+              onclick="document.querySelector('[data-target=\'dashboard-page\']').click()"
+              style="padding: 0.5rem 0; color: white;"><i class="ph-bold ph-squares-four"></i> <span
+                data-i18n="nav_dashboard">Dashboard</span></button>
+            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 0.5rem 0;">
+            <button id="logout-btn" class="btn-danger-small full-width" style="margin-top:0.5rem;"
+              data-i18n="btn_logout">Logout</button>
+          </div>
+        </div>
+        <button id="emergency-btn" class="btn-danger"><i class="ph-fill ph-warning"></i> <span class="hide-mobile"
+            data-i18n="nav_emergency">Emergency</span></button>
+        <button class="menu-toggle" id="menu-toggle" style="margin-left: 0.5rem;">
+          <i class="ph ph-list" style="font-size: 1.8rem;"></i>
+        </button>
+      </div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#" data-target="home-page" class="active" data-i18n="nav_home">Home</a></li>
+        <li><a href="#" data-target="checker-page" data-i18n="nav_checker">Symptom Checker</a></li>
+        <li><a href="#" data-target="chatbot-page" data-i18n="nav_chatbot">Chatbot</a></li>
+        <li><a href="#" data-target="wellness-page" data-i18n="nav_wellness">Wellness Test</a></li>
+        <li><a href="#" data-target="dashboard-page" data-i18n="nav_dashboard">Dashboard</a></li>
+        <li><a href="#" data-target="quests-page" data-i18n="nav_quests">Health Quests</a></li>
+      </ul>
+    </nav>
+
+    <!-- Pages Container -->
+    <main class="pages-container">
+
+      <!-- HOME PAGE -->
+      <section id="home-page" class="page active">
+        <div class="hero">
+          <div class="hero-content">
+            <h1 data-i18n="hero_title">Where Care Meets Intelligence</h1>
+            <p data-i18n="hero_subtitle">Empowering you with AI-driven early disease detection, 24/7 mental health
+              support, and instant access to doctors. Taking care of your health has never been this accessible.</p>
+            <div class="hero-buttons">
+              <button class="btn-primary" data-nav="checker-page" data-i18n="btn_check_symptoms">Check Symptoms
+                Now</button>
+              <button class="btn-outline" data-nav="chatbot-page" data-i18n="btn_talk_ai">Talk to AI Therapist</button>
+            </div>
+          </div>
+          <div class="hero-image">
+            <!-- Using CSS shapes and gradients to simulate modern artwork instead of static placeholder -->
+            <div class="hero-art">
+              <div class="glass-card art-card-1">
+                <i class="ph-fill ph-activity"></i>
+                <div class="art-card-text">
+                  <strong data-i18n="art_ai_analysis">AI Analysis</strong>
+                  <span data-i18n="art_accuracy">98.5% Accuracy</span>
+                </div>
+              </div>
+              <div class="glass-card art-card-2">
+                <i class="ph-fill ph-brain"></i>
+                <div class="art-card-text">
+                  <strong data-i18n="art_mental_support">Mental Support</strong>
+                  <span data-i18n="art_available">24/7 Available</span>
+                </div>
+              </div>
+              <div class="neural-nexus">
+                <div class="glass-orb">
+                  <div class="orb-core"></div>
+                  <div class="orb-plasma"></div>
+                  <div class="orb-reflection"></div>
+                  <div class="orb-ekg"></div>
+                </div>
+                <!-- Neural Connectors -->
+                <div class="neural-links">
+                  <div class="link l1"></div>
+                  <div class="link l2"></div>
+                  <div class="link l3"></div>
+                </div>
+                <div class="nexus-rings">
+                  <div class="ring-laser r1"></div>
+                  <div class="ring-laser r2"></div>
+                </div>
+                <div class="nexus-nodes">
+                  <div class="nexus-node n1">
+                    <i class="ph-bold ph-activity"></i>
+                    <span class="node-tag">AI ACTIVE</span>
+                  </div>
+                  <div class="nexus-node n2">
+                    <i class="ph-bold ph-heart"></i>
+                    <span class="node-tag">VITAL SYNC</span>
+                  </div>
+                  <div class="nexus-node n3">
+                    <i class="ph-bold ph-brain"></i>
+                    <span class="node-tag">NEURAL MAP</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="features-section">
+          <h2 class="section-title" data-i18n="features_title">Comprehensive Health Platform</h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="icon-wrapper"><i class="ph-fill ph-stethoscope"></i></div>
+              <h3 data-i18n="feat_1_title">Early Disease Detection</h3>
+              <p data-i18n="feat_1_desc">Input your symptoms and let our advanced AI suggest possible conditions and
+                precautions.</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon-wrapper"><i class="ph-fill ph-chat-circle-text"></i></div>
+              <h3 data-i18n="feat_2_title">Mental Health Chatbot</h3>
+              <p data-i18n="feat_2_desc">A safe, confidential space to chat about your feelings and receive emotional
+                support.</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon-wrapper"><i class="ph-fill ph-bell-ringing"></i></div>
+              <h3 data-i18n="feat_4_title">Smart Alerts & Tracking</h3>
+              <p data-i18n="feat_4_desc">Get reminders for hydration, meds, and track your daily health streaks for
+                rewards.</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon-wrapper"><i class="ph-fill ph-brain"></i></div>
+              <h3 data-i18n="feat_5_title">Mental Wellness Assessment</h3>
+              <p data-i18n="feat_5_desc">Take structured mental health tests and monitor your emotional well-being.</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon-wrapper"><i class="ph-fill ph-first-aid text-red"></i></div>
+              <h3 data-i18n="feat_6_title">Instant Emergency Access</h3>
+              <p data-i18n="feat_6_desc">One-tap access to national health helplines for critical situations.</p>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+
+      </section>
+
+
+      <!-- SYMPTOM CHECKER PAGE -->
+      <section id="checker-page" class="page hidden">
+        <div class="page-header">
+          <h2 data-i18n="checker_title">AI Symptom Checker</h2>
+          <p data-i18n="checker_subtitle">Describe what you're experiencing, and our AI will provide insights.</p>
+        </div>
+        <div class="checker-container glass-panel">
+          <div class="input-section">
+            <label for="symptoms-input" data-i18n="checker_label">How are you feeling today?</label>
+            <textarea id="symptoms-input"
+              placeholder="E.g., I have a mild headache, slight fever since yesterday, and feel extremely tired..."
+              rows="4"></textarea>
+
+            <div style="display:flex; gap:1rem; margin-top:1rem;">
+              <div style="flex:1;">
+                <label for="symptoms-duration"
+                  style="font-size:0.9rem; font-weight:500; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Duration</label>
+                <select id="symptoms-duration"
+                  style="width:100%; padding:0.8rem; border-radius:var(--border-radius-sm); border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:inherit; font-family:inherit;">
+                  <option value="1-2 days" style="color:black;">1-2 days</option>
+                  <option value="3-5 days" style="color:black;">3-5 days</option>
+                  <option value="More than a week" style="color:black;">More than a week</option>
+                </select>
+              </div>
+              <div style="flex:1;">
+                <label for="symptoms-severity"
+                  style="font-size:0.9rem; font-weight:500; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Severity</label>
+                <select id="symptoms-severity"
+                  style="width:100%; padding:0.8rem; border-radius:var(--border-radius-sm); border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:inherit; font-family:inherit;">
+                  <option value="Mild" style="color:black;">Mild</option>
+                  <option value="Moderate" style="color:black;">Moderate</option>
+                  <option value="Severe" style="color:black;">Severe</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="tags-container mt-4" id="common-symptoms">
+              <!-- Populated by JS -->
+            </div>
+            <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+              <button class="btn-primary" id="analyze-btn" style="flex:2;">
+                <i class="ph-bold ph-magic-wand"></i> <span data-i18n="btn_analyze_text">Analyze Symptoms</span>
+              </button>
+              <button class="btn-secondary" id="reset-checker-btn"
+                style="flex:1; border:1px solid var(--glass-border); display:flex; justify-content:center; align-items:center; gap:0.5rem;">
+                <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <div class="results-section hidden" id="checker-results" style="margin-top: 2rem; min-height: 250px;">
+            <div class="loading-state hidden" id="checker-loading"
+              style="display:flex; flex-direction:column; justify-content:center; align-items:center; min-height: 250px; width: 100%;">
+              <div class="spinner"></div>
+              <p class="mt-2 text-muted" data-i18n="analyzing_text">AI is thinking...</p>
+            </div>
+
+            <div id="checker-error" class="hidden glass-card"
+              style="color: var(--danger); text-align: center; padding: 2rem; border-color: rgba(239, 68, 68, 0.3);">
+              <i class="ph-bold ph-warning-octagon" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+              <span id="checker-error-text">API Error</span>
+            </div>
+
+            <div class="results-content hidden" id="results-content">
+              <div class="result-header" style="margin-bottom:1.5rem;">
+                <i class="ph-fill ph-stethoscope text-teal" style="font-size:2rem;"></i>
+                <h3 style="font-size:1.5rem;">Condition: <span id="res-condition" class="text-white"></span></h3>
+              </div>
+
+              <div class="precautions-box">
+                <div
+                  style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--glass-border); padding-bottom:1rem;">
+                  <strong style="color:var(--text-muted);">Confidence Score</strong>
+                  <span id="res-confidence"
+                    style="padding:0.3rem 0.8rem; border-radius:1rem; font-weight:600; font-size:0.85rem;"></span>
+                </div>
+
+                <h4 style="margin-bottom:0.8rem; color:var(--text-main);">Practical Advice</h4>
+                <p id="res-advice" style="color:var(--text-muted); line-height:1.6; margin-bottom:1rem;"></p>
+
+                <div id="res-medicines-box" class="hidden"
+                  style="margin-top:1rem; border-top:1px solid var(--glass-border); padding-top:1rem;">
+                  <h4 data-i18n="medicines_title" style="margin-bottom:0.5rem; color:var(--text-main);">Common Medicines
+                  </h4>
+                  <p class="text-muted" style="font-size:0.85rem; margin-bottom:0.5rem;">*Always consult a doctor before
+                    taking medication.</p>
+                  <ul id="res-medicines-list"
+                    style="padding-left:1.5rem; color:var(--text-muted); line-height:1.6; margin-bottom:0.5rem;">
+                  </ul>
+                </div>
+
+                <div id="res-warning-box" class="hidden"
+                  style="margin-top:1rem; padding:1rem; background:rgba(239, 68, 68, 0.1); border-left:4px solid var(--danger); border-radius:0 4px 4px 0;">
+                  <div
+                    style="display:flex; align-items:center; gap:0.5rem; color:var(--danger); font-weight:600; margin-bottom:0.5rem;">
+                    <i class="ph-fill ph-warning"></i> Warning
+                  </div>
+                  <p id="res-warning" style="color:var(--text-main); font-size:0.9rem; line-height:1.5;"></p>
+                </div>
+              </div>
+
+              <div class="action-box mt-4">
+                <p data-i18n="consult_advice">For an accurate diagnosis, please consult a medical professional.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHATBOT PAGE -->
+      <section id="chatbot-page" class="page hidden">
+        <div class="chat-container glass-panel">
+          <div class="chat-header"
+            style="flex-shrink: 0; display:flex; align-items:center; justify-content:space-between; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="display:flex; align-items:center; gap: 1rem;">
+              <div class="chat-avatar"
+                style="width:40px; height:40px; border-radius:50%; background:rgba(14,165,233,0.2); display:flex; align-items:center; justify-content:center;">
+                <i class="ph-fill ph-robot text-teal" style="font-size:1.5rem;"></i>
+              </div>
+              <div class="chat-title">
+                <h3 data-i18n="bot_title" style="margin: 0; font-size: 1.1rem;">Swasthya Saathi AI</h3>
+                <div class="status online"
+                  style="font-size: 0.8rem; color: var(--success); display: flex; align-items: center; gap: 0.3rem;">
+                  <span
+                    style="width: 6px; height: 6px; background: var(--success); border-radius: 50%; display: inline-block;"></span>
+                  <span data-i18n="bot_status">Online - Here to listen</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items: center; gap:1.2rem;">
+              <!-- Language Toggles -->
+              <div class="chatbot-lang-toggles" id="chat-lang-group">
+                <button class="chatbot-lang-btn active" data-lang="en">EN</button>
+                <button class="chatbot-lang-btn" data-lang="hi">हि</button>
+              </div>
+
+              <button class="btn-clear read-aloud-btn" id="toggle-read-aloud" title="Read responses aloud"
+                style="padding:0; display:flex; align-items:center;">
+                <i class="ph-fill ph-speaker-high" style="font-size: 1.4rem;"></i>
+              </button>
+
+              <button class="btn-clear read-aloud-btn" id="chat-reset-btn" title="Reset Chat"
+                style="padding:0; display:flex; align-items:center;">
+                <i class="ph-bold ph-arrows-clockwise" style="font-size: 1.4rem;"></i>
+              </button>
+
+              <a href="tel:14416" class="btn-outline-small"
+                style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem; color: #fff; font-size: 0.85rem; padding: 6px 12px;">
+                <i class="ph-fill ph-phone-call"></i> <span data-i18n="btn_manas">Call MANAS</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Topics Strip -->
+          <div class="chatbot-topics-strip" id="chat-topics">
+            <div class="topic-chip active" data-cat="general"><i class="ph-fill ph-house-line"></i> <span
+                data-i18n="cat_general">General</span></div>
+            <div class="topic-chip" data-cat="anxiety"><i class="ph-fill ph-wind"></i> <span
+                data-i18n="cat_anxiety">Anxiety</span></div>
+            <div class="topic-chip" data-cat="mood"><i class="ph-fill ph-cloud-sun"></i> <span
+                data-i18n="cat_mood">Mood</span></div>
+            <div class="topic-chip" data-cat="stress"><i class="ph-fill ph-fire"></i> <span
+                data-i18n="cat_stress">Stress</span></div>
+            <div class="topic-chip" data-cat="sleep"><i class="ph-fill ph-moon"></i> <span
+                data-i18n="cat_sleep">Sleep</span></div>
+            <div class="topic-chip" data-cat="relationships"><i class="ph-fill ph-users-three"></i> <span
+                data-i18n="cat_relations">Relations</span></div>
+            <div class="topic-chip" data-cat="selfcare"><i class="ph-fill ph-heart"></i> <span
+                data-i18n="cat_selfcare">Self-care</span></div>
+            <div class="topic-chip" data-cat="crisis" style="color: var(--danger);"><i
+                class="ph-fill ph-warning-diamond"></i> <span data-i18n="cat_crisis">Crisis</span></div>
+          </div>
+
+          <div class="chat-history" id="chat-history"
+            style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;">
+            <!-- Welcome Message Loaded via JS -->
+          </div>
+
+          <div class="chat-input-area" id="chat-input-area">
+            <button id="chat-mic-btn" class="btn-clear mic-btn" title="Voice Input">
+              <i class="ph-fill ph-microphone"></i>
+            </button>
+            <textarea id="chat-input" placeholder="Type your message here..." data-i18n-ph="chat_placeholder" rows="1"></textarea>
+            <button id="chat-send-btn" class="btn-icon">
+              <i class="ph-bold ph-paper-plane-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DASHBOARD PAGE -->
+      <section id="dashboard-page" class="page hidden">
+        <div class="page-header">
+          <h2 data-i18n="dashboard_title">Your Health Dashboard</h2>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Profile Overview -->
+          <div class="dash-card profile-card glass-panel"
+            style="grid-column: 1 / -1; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <div class="profile-avatar"
+              style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:2.5rem; font-weight:bold; color:white; flex-shrink:0;">
+              <span id="dash-user-initial">?</span>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
+                <h3 id="dash-user-name" style="margin:0; font-size:1.8rem;">Guest User</h3>
+                <button id="edit-name-btn" title="Edit Name"
+                  style="background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:var(--text-muted); padding:4px 8px; cursor:pointer; font-size:0.8rem; display:flex; align-items:center; gap:4px;">
+                  <i class="ph-bold ph-pencil-simple"></i> <span data-i18n="btn_edit">Edit</span>
+                </button>
+              </div>
+              <!-- Inline name edit form (hidden by default) -->
+              <div id="edit-name-form"
+                style="display:none; margin-top:0.5rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                <input type="text" id="edit-name-input" placeholder="Enter new name" data-i18n-ph="ph_enter_name"
+                  style="flex:1; min-width:160px; padding:0.5rem 0.8rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); color:#fff; font-size:1rem; outline:none; font-family:inherit;" />
+                <button id="save-name-btn" class="btn-primary-small" data-i18n="btn_save">Save</button>
+                <button id="cancel-name-btn"
+                  style="background:transparent; border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:var(--text-muted); padding:5px 10px; cursor:pointer; font-size:0.85rem;"
+                  data-i18n="btn_cancel">Cancel</button>
+              </div>
+              <p id="dash-user-email" class="text-muted"
+                style="margin-bottom:1rem; margin-top:0.4rem; font-size:0.95rem;">Not logged in</p>
+              <div style="display:flex; gap:2rem;">
+                <div>
+                  <span class="text-muted"
+                    style="font-size:0.85rem; display:block; text-transform:uppercase; letter-spacing:1px;"
+                    data-i18n="label_rank_level">Rank /
+                    Level</span>
+                  <strong id="dash-user-level" style="font-size:1.4rem; color:var(--primary);"><i
+                      class="ph-fill ph-medal"></i> <span data-i18n="rank_bronze">Bronze</span></strong>
+                </div>
+                <div>
+                  <span class="text-muted"
+                    style="font-size:0.85rem; display:block; text-transform:uppercase; letter-spacing:1px;"
+                    data-i18n="label_hp">Health
+                    Points</span>
+                  <strong id="dash-user-xp" style="font-size:1.4rem; color:var(--secondary);">0 XP</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Gamification Streak -->
+          <div class="dash-card streak-card glass-panel">
+            <div class="streak-header">
+              <h3><i class="ph-fill ph-fire text-orange"></i> <span data-i18n="streak_title">Health Streak</span></h3>
+              <div class="streak-count" id="streak-count">Day --</div>
+            </div>
+            <div class="streak-progress">
+              <div class="streak-bar" style="width: 57%;"></div>
+            </div>
+            <p class="streak-msg" data-i18n="streak_msg">You're doing great! Keep logging daily.</p>
+            <button class="btn-primary-small mt-2" id="daily-check-in-btn" data-i18n="btn_checkin">Daily
+              Check-in</button>
+          </div>
+
+          <!-- Smart Alerts -->
+          <div class="dash-card alerts-card glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom:1.5rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;"><i
+                class="ph-fill ph-bell-ringing text-blue" style="font-size:1.5rem;"></i> <span
+                data-i18n="alerts_title">Smart Reminders</span>
+            </h3>
+            <ul class="alerts-list"
+              style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:1rem;">
+              <li
+                style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:1rem; border-radius:12px; border-left: 4px solid var(--orange); transition:all 0.3s ease;">
+                <div>
+                  <strong style="display:block; font-size:1.1rem; color:var(--white); margin-bottom:0.3rem;"
+                    data-i18n="alert_move_title">Time to Move!</strong>
+                  <span
+                    style="font-size:0.85rem; color:var(--text-muted); display:inline-block; max-width:250px; line-height:1.4;"
+                    data-i18n="alert_move_desc">It
+                    has been a while since your last activity. Try completing a 15-minute walk to maintain your
+                    streak.</span>
+                </div>
+                <button class="btn-done btn-clear"
+                  style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(16,185,129,0.4); background: rgba(16,185,129,0.1); color: var(--primary); display:flex; align-items:center; justify-content:center; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(16,185,129,0.1); cursor:pointer;">
+                  <i class="ph-bold ph-check" style="font-size:1.2rem;"></i>
+                </button>
+              </li>
+              <li
+                style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:1rem; border-radius:12px; border-left: 4px solid var(--primary); transition:all 0.3s ease;">
+                <div>
+                  <strong style="display:block; font-size:1.1rem; color:var(--white); margin-bottom:0.3rem;"
+                    data-i18n="alert_water_title">Drink Water</strong>
+                  <span
+                    style="font-size:0.85rem; color:var(--text-muted); display:inline-block; max-width:250px; line-height:1.4;"
+                    data-i18n="alert_water_desc">You
+                    haven't logged any water intake. Drink a glass right now.</span>
+                </div>
+                <button class="btn-done btn-clear"
+                  style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(16,185,129,0.4); background: rgba(16,185,129,0.1); color: var(--primary); display:flex; align-items:center; justify-content:center; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(16,185,129,0.1); cursor:pointer;">
+                  <i class="ph-bold ph-check" style="font-size:1.2rem;"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Trophy Case (Moved to Dashboard) -->
+          <div class="dash-card trophy-card glass-panel"
+            style="padding: 1.5rem; display: flex; flex-direction: column;">
+            <h3 style="margin-bottom:1.5rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;"><i
+                class="ph-fill ph-trophy text-yellow" style="font-size:1.5rem;"></i> <span
+                data-i18n="trophy_title">Trophy Case</span>
+            </h3>
+            <div class="trophy-grid-2x2" style="flex: 1; display: grid; align-items: center;">
+              <!-- Badge 1: Starter -->
+              <div class="badge-item" style="text-align:center;">
+                <div
+                  style="width:85px; height:85px; border-radius:50%; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; margin:0 auto; color:white; font-size:2.5rem; box-shadow: 0 8px 20px rgba(16,185,129,0.3);">
+                  <i class="ph-fill ph-egg"></i>
+                </div>
+                <p style="font-size:0.85rem; font-weight:800; margin-top:0.6rem; color: #fff;" data-i18n="badge1_name">
+                  First Steps</p>
+              </div>
+              <!-- Badge 2: Streak -->
+              <div class="badge-item" style="text-align:center; opacity:0.35;">
+                <div
+                  style="width:85px; height:85px; border-radius:50%; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; margin:0 auto; color:white; font-size:2.5rem;">
+                  <i class="ph-fill ph-fire"></i>
+                </div>
+                <p style="font-size:0.85rem; font-weight:700; margin-top:0.6rem; color: var(--text-muted);"
+                  data-i18n="badge2_name">7-Day Streak</p>
+              </div>
+              <!-- Badge 3: Solver -->
+              <div class="badge-item" style="text-align:center; opacity:0.35;">
+                <div
+                  style="width:85px; height:85px; border-radius:50%; background:linear-gradient(135deg, #3b82f6, #2563eb); display:flex; align-items:center; justify-content:center; margin:0 auto; color:white; font-size:2.5rem;">
+                  <i class="ph-fill ph-stethoscope"></i>
+                </div>
+                <p style="font-size:0.85rem; font-weight:700; margin-top:0.6rem; color: var(--text-muted);"
+                  data-i18n="badge3_name">Solver</p>
+              </div>
+              <!-- Badge 4: Wellness -->
+              <div class="badge-item" style="text-align:center; opacity:0.35;">
+                <div
+                  style="width:85px; height:85px; border-radius:50%; background:linear-gradient(135deg, #a855f7, #9333ea); display:flex; align-items:center; justify-content:center; margin:0 auto; color:white; font-size:2.5rem;">
+                  <i class="ph-fill ph-brain"></i>
+                </div>
+                <p style="font-size:0.85rem; font-weight:700; margin-top:0.6rem; color: var(--text-muted);"
+                  data-i18n="badge4_name">Master</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health Logs Summary -->
+          <div class="dash-card logs-card glass-panel full-col">
+            <h3><i class="ph-fill ph-chart-line-up text-green"></i> <span data-i18n="history_title">Recent
+                Assessments</span></h3>
+            <div class="logs-table-wrapper">
+              <table class="logs-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="th_date">Date</th>
+                    <th data-i18n="th_symptoms">Symptoms</th>
+                    <th data-i18n="th_prediction">AI Prediction</th>
+                    <th data-i18n="th_status">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="assessment-logs-body">
+                  <!-- New assessments will be prepended here in real-time -->
+                  <tr id="no-assessments-row">
+                    <td colspan="4" style="text-align:center; padding: 2rem; color: var(--text-muted);"
+                      data-i18n="no_assessments_msg">No assessments recorded yet. Take a symptom test to see results!
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- WELLNESS TEST PAGE -->
+      <section id="wellness-page" class="page hidden">
+        <div class="page-header">
+          <h2 data-i18n="wellness_title">Mental Wellness Assessment</h2>
+          <p data-i18n="wellness_subtitle">A quick screening tool to understand your emotional well-being over the past
+            2 weeks.</p>
+        </div>
+
+        <div class="checker-container glass-panel" id="wellness-test-container">
+          <div id="wellness-questions" style="display:flex; flex-direction:column; gap:1.5rem;">
+            <!-- JS injected -->
+          </div>
+          <div style="display:flex; gap:1rem; margin-top:2rem;">
+            <button class="btn-secondary full-width" id="reset-wellness-btn" style="flex:1;">
+              <i class="ph-bold ph-arrow-counter-clockwise"></i> <span data-i18n="btn_reset_wellness_text">Reset
+                Test</span>
+            </button>
+            <button class="btn-primary full-width" id="submit-wellness-btn" style="flex:2;">
+              <i class="ph-bold ph-check-circle"></i> <span data-i18n="btn_submit_wellness_text">Calculate Score</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="results-section hidden" id="wellness-results" style="margin-top: 2rem;">
+          <div class="glass-panel"
+            style="text-align: center; padding: 2rem; display: flex; flex-direction: column; align-items: center;">
+            <h3 data-i18n="wellness_result_title" style="margin-bottom: 1rem;">Assessment Results</h3>
+
+            <div id="wellness-score-display"
+              style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;" class="text-blue">
+            </div>
+            <div id="wellness-risk-level" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;"></div>
+            <p id="wellness-advice"
+              style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            </p>
+            <p class="text-muted" style="font-size: 0.85rem;" data-i18n="wellness_disclaimer">*This is a preliminary
+              screening tool, not a clinical diagnosis.</p>
+            <button class="btn-secondary mt-4" data-nav="chatbot-page" data-i18n="btn_talk_ai_wellness">Discuss with
+              Saathi AI</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- HEALTH QUESTS PAGE -->
+      <section id="quests-page" class="page hidden">
+        <div class="row align-center mb-4"
+          style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 2rem;">
+          <div>
+            <h2 style="font-size: 2.5rem; margin-bottom:0.5rem;"><i class="ph-fill ph-ranking text-secondary"></i>
+              <span data-i18n="quests_title">Health Quests</span>
+            </h2>
+            <p class="text-muted" data-i18n="quests_subtitle">Turn healthy habits into a rewarding adventure.</p>
+          </div>
+          <div style="text-align:right;">
+            <span
+              style="font-size: 2rem; color: var(--orange); font-weight:800; display:flex; align-items:center; gap:0.5rem;">
+              <i class="ph-fill ph-fire"></i> <span id="streak-counter">0</span> <span
+                data-i18n="streak_days_suffix">Day Streak</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: 1fr; margin-bottom:2rem;">
+          <div class="glass-card full-width" style="flex-direction: column; align-items: stretch;">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; width:100%;">
+              <h3 style="font-size:1.5rem; color:var(--primary); margin:0;"><i class="ph-fill ph-star"></i> <span
+                  data-i18n="level_text">Level</span> <span id="user-level">1</span></h3>
+              <span id="user-xp" style="font-weight:700;">0 <span data-i18n="xp_text">XP</span> / 100 <span
+                  data-i18n="xp_text">XP</span></span>
+            </div>
+            <!-- Progress Bar -->
+            <div
+              style="width:100%; background: rgba(255,255,255,0.1); height: 1.5rem; border-radius: 20px; overflow:hidden; border: 1px solid var(--glass-border);">
+              <div id="xp-progress-bar"
+                style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.5s ease-out;">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 1rem; font-size:1.5rem;"><i class="ph-fill ph-calendar-check text-blue"></i>
+          <span data-i18n="daily_challenges">Daily Challenges</span>
+        </h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));"
+          id="quest-cards-container">
+          <!-- Quest Card 1 -->
+          <div class="glass-card quest-card" id="quest-card-1"
+            style="flex-direction: column; align-items: stretch; gap: 0;">
+            <div style="display:flex; align-items:center; gap: 1rem; margin-bottom: 1rem; width:100%;">
+              <div class="btn-icon" style="background-color:rgba(14, 165, 233, 0.2); color:#38bdf8;"><i
+                  class="ph-fill ph-drop"></i></div>
+              <div>
+                <h4 style="font-size:1.2rem; margin:0;" data-i18n="quest1_title">Hydration Hero</h4>
+                <p class="text-muted" style="font-size:0.9rem; margin:0;" data-i18n="quest1_desc">Drink 8 glasses of
+                  water today.</p>
+              </div>
+            </div>
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; margin-top: auto; border-top: 1px solid var(--glass-border); padding-top: 1rem; width:100%;">
+              <span style="color:var(--secondary); font-weight:700;">+20 <span data-i18n="xp_text">XP</span></span>
+              <button class="btn-primary-small quest-btn" data-xp="20" data-quest="1"
+                data-i18n="btn_complete">Complete</button>
+            </div>
+          </div>
+
+          <!-- Quest Card 2 -->
+          <div class="glass-card quest-card" id="quest-card-2"
+            style="flex-direction: column; align-items: stretch; gap: 0;">
+            <div style="display:flex; align-items:center; gap: 1rem; margin-bottom: 1rem; width:100%;">
+              <div class="btn-icon" style="background-color:rgba(245, 158, 11, 0.2); color:var(--orange);"><i
+                  class="ph-bold ph-sneaker"></i></div>
+              <div>
+                <h4 style="font-size:1.2rem; margin:0;" data-i18n="quest2_title">Active Walker</h4>
+                <p class="text-muted" style="font-size:0.9rem; margin:0;" data-i18n="quest2_desc">Complete a 15-minute
+                  walk.</p>
+              </div>
+            </div>
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; margin-top: auto; border-top: 1px solid var(--glass-border); padding-top: 1rem; width:100%;">
+              <span style="color:var(--secondary); font-weight:700;">+50 <span data-i18n="xp_text">XP</span></span>
+              <button class="btn-primary-small quest-btn" data-xp="50" data-quest="2"
+                data-i18n="btn_complete">Complete</button>
+            </div>
+          </div>
+
+          <!-- Quest Card 3 -->
+          <div class="glass-card quest-card" id="quest-card-3"
+            style="flex-direction: column; align-items: stretch; gap: 0;">
+            <div style="display:flex; align-items:center; gap: 1rem; margin-bottom: 1rem; width:100%;">
+              <div class="btn-icon" style="background-color:rgba(168, 85, 247, 0.2); color:#c084fc;"><i
+                  class="ph-fill ph-brain"></i></div>
+              <div>
+                <h4 style="font-size:1.2rem; margin:0;" data-i18n="quest3_title">Mindful Moment</h4>
+                <p class="text-muted" style="font-size:0.9rem; margin:0;" data-i18n="quest3_desc">Take the Wellness
+                  Test.</p>
+              </div>
+            </div>
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; margin-top: auto; border-top: 1px solid var(--glass-border); padding-top: 1rem; width:100%;">
+              <span style="color:var(--secondary); font-weight:700;">+30 <span data-i18n="xp_text">XP</span></span>
+              <button class="btn-primary-small quest-btn" data-xp="30" data-quest="3"
+                data-i18n="btn_complete">Complete</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Milestones -->
+        <h3 style="margin-top: 3rem; margin-bottom: 1rem; font-size:1.5rem;"><i
+            class="ph-fill ph-flag-banner text-orange"></i> <span data-i18n="weekly_milestones">Weekly Milestones</span>
+        </h3>
+        <div class="dashboard-grid" style="grid-template-columns: 1fr; margin-bottom:2rem;"
+          id="weekly-quests-container">
+          <!-- Weekly Quest 1 -->
+          <div class="glass-card quest-card" id="quest-card-w1"
+            style="flex-direction: column; align-items: stretch; padding: 1.5rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.03)); border: 1px solid rgba(245, 158, 11, 0.3); position: relative; overflow: hidden;">
+            <div
+              style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(245, 158, 11, 0.1); filter: blur(40px); border-radius: 50%;">
+            </div>
+
+            <div
+              style="display:flex; align-items:center; gap: 1.2rem; margin-bottom: 1.5rem; width:100%; position: relative;">
+              <div class="btn-icon"
+                style="background: linear-gradient(135deg, var(--orange), #ea580c); color:#fff; width: 55px; height: 55px; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); border: none;">
+                <i class="ph-fill ph-video-camera" style="font-size: 1.8rem;"></i>
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
+                  <span
+                    style="font-size: 0.65rem; background: var(--orange); color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"
+                    data-i18n="milestone_badge">Milestone</span>
+                  <h4 style="font-size:1.3rem; margin:0; color:#fff; font-weight: 700;" data-i18n="w_quest1_title">
+                    Tele-Health Pioneer</h4>
+                </div>
+                <p class="text-muted" style="font-size:0.95rem; margin:0;" data-i18n="w_quest1_desc">Complete 1
+                  Telemedicine consultation this week.</p>
+              </div>
+            </div>
+
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; margin-top: auto; padding-top: 1.2rem; border-top: 1px solid rgba(245, 158, 11, 0.2); width:100%; position: relative;">
+              <div>
+                <span class="text-muted"
+                  style="font-size: 0.8rem; display: block; margin-bottom: 0.2rem; font-weight: 600; text-transform: uppercase;"
+                  data-i18n="reward_label">Reward</span>
+                <span
+                  style="color:var(--orange); font-weight:900; font-size:1.4rem; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);">+250
+                  <span data-i18n="xp_text">XP</span></span>
+              </div>
+              <button class="btn-primary quest-btn"
+                style="background: linear-gradient(135deg, var(--orange), #ea580c); border:none; padding: 0.7rem 1.5rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);"
+                data-xp="250" data-quest="w1" data-i18n="btn_claim">Claim Achievement</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges & Leaderboard Grid -->
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+
+
+
+          <!-- Leaderboard -->
+          <div>
+            <h3 style="margin-bottom: 2rem; font-size:1.6rem; display: flex; align-items: center; gap: 0.8rem;">
+              <i class="ph-fill ph-trophy" style="color: var(--accent); font-size: 2rem;"></i>
+              <span data-i18n="leaderboard_title">Global Leaderboard</span>
+            </h3>
+
+            <div class="glass-card"
+              style="flex-direction:column; padding: 1.5rem; border-radius: 16px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255,255,255,0.05);">
+              <div id="leaderboard-list" style="display: flex; flex-direction: column; width: 100%;">
+                <p style="text-align:center; color: var(--text-muted); padding: 1rem;">Loading leaderboard...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TELEMEDICINE PAGE (EASY TO DELETE) -->
+      <!-- TELEMEDICINE START -->
+      <section id="telemedicine-page" class="page hidden">
+        <div class="page-header" style="text-align: center; margin-bottom: 3rem;">
+    </main>
+
+
+    <!-- Emergency Modal -->
+    <div class="modal hidden" id="emergency-modal">
+      <div class="modal-overlay" id="close-modal-overlay"></div>
+      <div class="modal-content glass-panel danger-border">
+        <div class="modal-header">
+          <h2 class="text-red"><i class="ph-fill ph-warning-octagon"></i> <span data-i18n="emg_title">Emergency
+              Services</span></h2>
+          <button class="close-btn" id="close-modal-btn"><i class="ph-bold ph-x"></i></button>
+        </div>
+        <div class="modal-body">
+          <p data-i18n="emg_desc">If you are experiencing a life-threatening emergency, please contact the authorities
+            immediately.</p>
+          <div class="emergency-numbers">
+            <div class="emg-card">
+              <i class="ph-fill ph-ambulance"></i>
+              <div class="emg-details">
+                <strong>National Ambulance</strong>
+                <span>108</span>
+              </div>
+              <a href="tel:108" class="btn-danger-small">Call</a>
+            </div>
+
+            <div class="emg-card">
+              <i class="ph-fill ph-brain"></i>
+              <div class="emg-details">
+                <strong>MANAS Mental Health Helpline</strong>
+                <span>14416 / 1800-891-4416</span>
+              </div>
+              <a href="tel:14416" class="btn-danger-small">Call</a>
+            </div>
+
+            <div class="emg-card">
+              <i class="ph-fill ph-phone"></i>
+              <div class="emg-details">
+                <strong>Women Helpline</strong>
+                <span>1091</span>
+              </div>
+              <a href="tel:1091" class="btn-danger-small">Call</a>
+            </div>
+
+            <div class="emg-card">
+              <i class="ph-fill ph-stethoscope"></i>
+              <div class="emg-details">
+                <strong>Free Medical Advice</strong>
+                <span>104</span>
+              </div>
+              <a href="tel:104" class="btn-danger-small">Call</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  </div>
+
+  <!-- Global Footer -->
+  <footer class="glass-panel"
+    style="margin-top: auto; padding: 3rem 5% 1.5rem; text-align: center; border-radius: 0; border-top: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.9);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-bottom: 2rem;">
+      <a href="#" class="footer-link" data-target="home-page">Home</a>
+      <a href="#" class="footer-link" data-target="checker-page">Symptom Checker</a>
+      <a href="#" class="footer-link" data-target="chatbot-page">Chatbot</a>
+      <a href="#" class="footer-link" data-target="dashboard-page">Dashboard</a>
+      <a href="#" class="footer-link" data-target="quests-page">Health Quests</a>
+    </div>
+    <div style="margin-bottom: 1rem;">
+      <div class="logo" style="justify-content: center;">
+        <i class="ph-fill ph-heartbeat"></i>
+        <span>Swasthya Saathi</span>
+      </div>
+    </div>
+    <p class="text-muted" style="font-size: 0.9rem; margin: 0;">Designed by Karma Crew</p>
+  </footer>
+  <script type="module" src="/src/main.js"></script>
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="hidden"
+    style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div class="glass-panel"
+      style="width: 90%; max-width: 400px; padding: 2rem; position: relative; animation: fadeIn 0.3s ease;">
+      <button id="close-auth-modal"
+        style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: white; border: none; font-size: 1.2rem; cursor: pointer;"><i
+          class="ph-bold ph-x"></i></button>
+      <h2 id="auth-title" style="text-align: center; margin-bottom: 0.5rem;">Welcome Back</h2>
+      <p id="auth-subtitle" class="text-muted" style="text-align: center; margin-bottom: 2rem; font-size: 0.9rem;">Login
+        to access premium features.</p>
+
+      <form id="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div>
+          <label style="display: block; margin-bottom: 0.3rem; font-size: 0.9rem;" data-i18n="label_email">Email
+            Address</label>
+          <input type="email" id="auth-email" required data-i18n-ph="ph_email"
+            style="width: 100%; padding: 0.8rem; border-radius: var(--border-radius-sm); border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.6); color: white;"
+            placeholder="you@example.com">
+        </div>
+        <div style="margin-top: 0.5rem;">
+          <label style="display: block; margin-bottom: 0.3rem; font-size: 0.9rem;"
+            data-i18n="label_password">Password</label>
+          <input type="password" id="auth-password" required data-i18n-ph="ph_password"
+            style="width: 100%; padding: 0.8rem; border-radius: var(--border-radius-sm); border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.6); color: white;"
+            placeholder="••••••••">
+        </div>
+        <div id="auth-error" class="hidden text-red" style="font-size: 0.85rem; text-align: center;"></div>
+        <button type="submit" id="auth-submit-btn" class="btn-primary" style="margin-top: 1rem;">Sign In</button>
+      </form>
+
+      <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;" class="text-muted">
+        <span id="auth-switch-text">Don't have an account?</span>
+        <a href="#" id="auth-switch-btn" class="text-blue" style="font-weight: bold;">Sign Up</a>
+      </p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+
+</html>
