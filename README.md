@@ -75,8 +75,6 @@ Contributions are welcome! Feel free to fork and submit a pull request.
 ## 👨‍💻 Team
 
 - Team Lead – Venugopal Rao
-- Team Member - Sushma Chavan
-
 ---
 
 ## How to deploy ?
